@@ -1,15 +1,60 @@
-Source: template-repository
-Section: unknown
+Source: friso
 Priority: optional
-Maintainer: Tsic404 <liuheng@deepin.org>
-Build-Depends: debhelper (>= 11)
-Standards-Version: 4.1.3
-Homepage: https://github.com/deepin-community/template-repository
-#Vcs-Browser: https://salsa.debian.org/debian/deepin-community-template-repository
-#Vcs-Git: https://salsa.debian.org/debian/deepin-community-template-repository.git
+Maintainer: Kentaro Hayashi <kenhys@xdump.org>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.5.1
+Section: libs
+Homepage: https://github.com/lionsoul2014/friso
+Vcs-Browser: https://salsa.debian.org/debian/friso
+Vcs-Git: https://salsa.debian.org/debian/friso.git
+Rules-Requires-Root: no
 
-Package: template-repository
+Package: friso
+Section: text
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: <insert up to 60 chars description>
- <insert long description, indented with spaces>
+Depends:
+ libfriso0 (= ${binary:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: Chinese word splitter command
+ Friso is an open source high performance Chinese word splitter.
+ .
+ This package contains configuration file and command line tool.
+ You can test friso functionality easily.
+
+Package: libfriso-dev
+Section: libdevel
+Architecture: any
+Depends:
+ libfriso0 (= ${binary:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: Chinese word splitter library for development
+ Friso is an open source high performance Chinese word splitter.
+ .
+ This package contains header files for developing a software
+ which uses friso as a library.
+
+Package: libfriso0
+Architecture: any
+Depends:
+ friso-dict,
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: Chinese word splitter library package
+ Friso is an open source high performance Chinese word splitter.
+ Friso uses the popular mmseg algorithm.
+ .
+ This package contains runtime library for using friso command.
+
+Package: friso-dict
+Architecture: all
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends}
+Multi-Arch: foreign
+Description: Chinese word splitter dictionary package
+ Friso is an open source high performance Chinese word splitter.
+ Friso uses the popular mmseg algorithm.
+ .
+ This package contains dictionary files for friso.

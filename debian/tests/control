@@ -1,0 +1,2 @@
+Tests: wo-dao-beijing
+Depends: friso, friso-dict, libfriso0, expect

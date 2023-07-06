@@ -1,5 +1,11 @@
-template-repository (1.0-1) unstable; urgency=medium
+friso (1.6.4+ds-2) unstable; urgency=medium
 
-  * Initial release
+  * Source only upload for migration to testing
 
- -- Tsic404 <liuheng@deepin.org>  Sat, 28 Jan 2023 13:46:49 +0800
+ -- Kentaro Hayashi <kenhys@xdump.org>  Sat, 27 Nov 2021 21:23:06 +0900
+
+friso (1.6.4+ds-1) unstable; urgency=medium
+
+  * Initial release (Closes: #982836)
+
+ -- Kentaro Hayashi <kenhys@xdump.org>  Fri, 12 Feb 2021 17:50:48 +0900
