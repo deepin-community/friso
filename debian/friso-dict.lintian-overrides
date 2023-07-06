@@ -1,0 +1,2 @@
+# Suppress nationa encoding (GBK) warnings
+friso-dict: national-encoding usr/share/friso/dict/*

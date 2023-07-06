@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+INPUT="我到北京"
+OUTPUT="我 到 北京"
+expect -c "
+set timeout 5
+spawn /usr/bin/friso -init /etc/friso/friso.ini
+expect \"friso>>\"
+send \"$INPUT\n\"
+expect \"分词结果:\"
+expect \"$OUTPUT\"
+exit 0
+"

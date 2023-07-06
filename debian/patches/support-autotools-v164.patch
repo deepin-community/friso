@@ -1,0 +1,329 @@
+From: HAYASHI Kentaro <kenhys@gmail.com>
+Date: Mon, 24 Nov 2014 02:24:39 +0900
+Subject: Support autotools
+
+Forwarded: https://github.com/lionsoul2014/friso/pull/13
+---
+ Makefile.am                    | 11 +++++++
+ autogen.sh                     |  7 +++++
+ configure.ac                   | 37 +++++++++++++++++++++++
+ friso.ini.in                   | 68 ++++++++++++++++++++++++++++++++++++++++++
+ friso.pc.in                    | 17 +++++++++++
+ src/Makefile.am                | 39 ++++++++++++++++++++++++
+ vendors/Makefile.am            |  1 +
+ vendors/dict/GBK/Makefile.am   | 29 ++++++++++++++++++
+ vendors/dict/Makefile.am       |  3 ++
+ vendors/dict/UTF-8/Makefile.am | 29 ++++++++++++++++++
+ 10 files changed, 241 insertions(+)
+ create mode 100644 Makefile.am
+ create mode 100755 autogen.sh
+ create mode 100644 configure.ac
+ create mode 100644 friso.ini.in
+ create mode 100644 friso.pc.in
+ create mode 100644 src/Makefile.am
+ create mode 100644 vendors/Makefile.am
+ create mode 100644 vendors/dict/GBK/Makefile.am
+ create mode 100644 vendors/dict/Makefile.am
+ create mode 100644 vendors/dict/UTF-8/Makefile.am
+
+diff --git a/Makefile.am b/Makefile.am
+new file mode 100644
+index 0000000..f8ec771
+--- /dev/null
++++ b/Makefile.am
+@@ -0,0 +1,11 @@
++SUBDIRS =	\
++	src	\
++	vendors
++
++#ACLOCAL_AMFLAGS = -l m4
++
++pkgconfigdir = $(libdir)/pkgconfig
++pkgconfig_DATA = friso.pc
++
++inidir = $(sysconfdir)/$(PACKAGE)
++dist_ini_DATA = friso.ini
+diff --git a/autogen.sh b/autogen.sh
+new file mode 100755
+index 0000000..0a8a85a
+--- /dev/null
++++ b/autogen.sh
+@@ -0,0 +1,7 @@
++#!/bin/sh
++mkdir -p m4
++libtoolize --force --copy
++aclocal --force --install
++autoheader
++automake --add-missing --copy
++autoconf
+diff --git a/configure.ac b/configure.ac
+new file mode 100644
+index 0000000..0489c5d
+--- /dev/null
++++ b/configure.ac
+@@ -0,0 +1,37 @@
++#                                               -*- Autoconf -*-
++# Process this file with autoconf to produce a configure script.
++
++AC_PREREQ([2.59])
++AC_INIT([friso], [1.6.4], [chenxin619315@gmail.com])
++AC_CONFIG_SRCDIR([src/friso_ctype.h])
++AC_CONFIG_HEADERS([config.h])
++AC_CONFIG_AUX_DIR([config])
++AC_CONFIG_MACRO_DIR([m4])
++
++AM_INIT_AUTOMAKE([tar-pax foreign])
++m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
++
++# Checks for programs.
++AC_PROG_CC
++
++AC_PROG_LIBTOOL
++
++# Checks for header files.
++AC_CHECK_HEADERS([stdlib.h string.h])
++
++# Checks for typedefs, structures, and compiler characteristics.
++
++# Checks for library functions.
++AC_CHECK_FUNCS([memset strcasecmp strdup])
++
++AC_CONFIG_FILES([
++  Makefile
++  src/Makefile
++  friso.pc
++  friso.ini
++  vendors/Makefile
++  vendors/dict/Makefile
++  vendors/dict/GBK/Makefile
++  vendors/dict/UTF-8/Makefile
++])
++AC_OUTPUT
+diff --git a/friso.ini.in b/friso.ini.in
+new file mode 100644
+index 0000000..605b902
+--- /dev/null
++++ b/friso.ini.in
+@@ -0,0 +1,68 @@
++# friso configuration file.
++#	do not change the name of the left key.
++# @email	chenxin619315@gmail.com
++# @date		2012-12-20
++#
++
++# charset, only UTF8 and GBK support.
++# set it with UTF8(0) or GBK(1)
++friso.charset = 0
++
++# lexicon directory absolute path.
++#	the value must end with '/'
++# this will tell friso how to find friso.lex.ini configuration file and all the lexicon files.
++#
++# if it is not start with '/' for linux, or matches no ':' for winnt in its value 
++#	friso will search the friso.lex.ini relative to friso.ini
++# absolute path search:
++# linux:	friso.lex_dir = /c/products/friso/dict/UTF-8/
++# Winnt:	friso.lex_dir = D:/products/friso/dict/UTF-8/
++# relative path search (All system)
++friso.lex_dir = @prefix@/share/friso/dict/UTF-8/
++
++# the maximum matching length.
++friso.max_len = 5 
++
++# 1 for recognition chinese name.
++#	and 0 for closed it.
++friso.r_name = 1
++
++# the maximum length for the cjk words in a
++#	chinese and english mixed word.
++friso.mix_len = 2
++
++# the maxinum length for the chinese last name adron.
++friso.lna_len = 1
++
++# append the synonyms words
++friso.add_syn = 1
++
++# clear the stopwords or not (1 to open it and 0 to close it)
++# @date 2013-06-13
++friso.clr_stw = 0
++
++# keep the unrecongized words or not (1 to open it and 0 to close it)
++# @date 2013-06-13
++friso.keep_urec = 0
++
++# use sphinx output style like 'admire|love|enjoy einsten'
++# @date 2013-10-25
++friso.spx_out = 0
++
++# start the secondary segmentation for complex english token.
++friso.en_sseg = 1
++
++# min length of the secondary segmentation token. (better larger than 1)
++friso.st_minl = 2
++
++# default keep punctuations for english token.
++friso.kpuncs = @%.#&+
++
++# the threshold value for a char not a part of a chinese name.
++friso.nthreshold = 2000000
++
++# default mode for friso.
++# 1 : simple mode - simply maxmum matching algorithm.
++# 2 : complex mode - four rules of mmseg alogrithm.
++# 3 : detect mode - only return the words that the do exists in the lexicon
++friso.mode = 2
+diff --git a/friso.pc.in b/friso.pc.in
+new file mode 100644
+index 0000000..c014995
+--- /dev/null
++++ b/friso.pc.in
+@@ -0,0 +1,17 @@
++prefix=@prefix@
++exec_prefix=@exec_prefix@
++bindir=@bindir@
++sbindir=@sbindir@
++libdir=@libdir@
++includedir=@includedir@
++datarootdir=@datarootdir@
++datadir=@datadir@
++friso=${bindir}/friso@EXEEXT@
++friso_init=${datadir}/friso/friso.ini
++
++Version: @VERSION@
++Name: Friso
++Description: Chinese word segmenter library
++Version: @VERSION@
++Libs: -L${libdir} -lfriso
++Cflags: -I${includedir}/friso
+diff --git a/src/Makefile.am b/src/Makefile.am
+new file mode 100644
+index 0000000..337e481
+--- /dev/null
++++ b/src/Makefile.am
+@@ -0,0 +1,39 @@
++#############################################################
++# friso chinese word segmentation makefile.		    #
++#		do not use it for commercial use.	    #
++# @author	lionsoul 				    #
++# @email	chenxin619315@gmail.com   		    #
++#############################################################
++
++bin_PROGRAMS = friso
++friso_CFLAGS = $(AM_CFLAGS)
++friso_LDADD = libfriso.la -lm
++friso_SOURCES = tst-friso.c
++
++lib_LTLIBRARIES = libfriso.la
++
++libfriso_la_LDFLAGS =		\
++	-version-info 0:0:0	\
++	-no-undefined
++
++libfriso_la_LIBADD = -lm
++
++libfriso_la_SOURCES =	\
++	friso_API.h	\
++	friso_ctype.h	\
++	friso.h		\
++	friso_array.c	\
++	friso.c		\
++	friso_ctype.c	\
++	friso_GBK.c	\
++	friso_hash.c	\
++	friso_lexicon.c	\
++	friso_link.c	\
++	friso_string.c	\
++	friso_UTF8.c
++
++libfriso_includedir = $(pkgincludedir)
++libfriso_include_HEADERS =	\
++	friso.h			\
++	friso_API.h		\
++	friso_ctype.h
+diff --git a/vendors/Makefile.am b/vendors/Makefile.am
+new file mode 100644
+index 0000000..8b1e4a2
+--- /dev/null
++++ b/vendors/Makefile.am
+@@ -0,0 +1 @@
++SUBDIRS = dict
+diff --git a/vendors/dict/GBK/Makefile.am b/vendors/dict/GBK/Makefile.am
+new file mode 100644
+index 0000000..b9dc669
+--- /dev/null
++++ b/vendors/dict/GBK/Makefile.am
+@@ -0,0 +1,29 @@
++
++dictdatadir = $(pkgdatadir)/dict/GBK
++dist_dictdata_DATA =		\
++	friso.lex.ini		\
++	lex-admin.lex		\
++	lex-cemixed.lex		\
++	lex-chars.lex		\
++	lex-cn-mz.lex		\
++	lex-cn-place.lex	\
++	lex-company.lex		\
++	lex-dname-1.lex		\
++	lex-dname-2.lex		\
++	lex-ecmixed.lex		\
++	lex-en-pun.lex		\
++	lex-en.lex		\
++	lex-festival.lex	\
++	lex-flname.lex		\
++	lex-food.lex		\
++	lex-lang.lex		\
++	lex-ln-adorn.lex	\
++	lex-lname.lex		\
++	lex-main.lex		\
++	lex-nation.lex		\
++	lex-net.lex		\
++	lex-org.lex		\
++	lex-sname.lex		\
++	lex-stopword.lex	\
++	lex-touris.lex		\
++	lex-units.lex
+diff --git a/vendors/dict/Makefile.am b/vendors/dict/Makefile.am
+new file mode 100644
+index 0000000..0c5f7e9
+--- /dev/null
++++ b/vendors/dict/Makefile.am
+@@ -0,0 +1,3 @@
++SUBDIRS = GBK	\
++	  UTF-8
++
+diff --git a/vendors/dict/UTF-8/Makefile.am b/vendors/dict/UTF-8/Makefile.am
+new file mode 100644
+index 0000000..5a3c59d
+--- /dev/null
++++ b/vendors/dict/UTF-8/Makefile.am
+@@ -0,0 +1,29 @@
++
++dictdatadir = $(pkgdatadir)/dict/UTF-8
++dist_dictdata_DATA =		\
++	friso.lex.ini		\
++	lex-admin.lex		\
++	lex-cemixed.lex		\
++	lex-chars.lex		\
++	lex-cn-mz.lex		\
++	lex-cn-place.lex	\
++	lex-company.lex		\
++	lex-dname-1.lex		\
++	lex-dname-2.lex		\
++	lex-ecmixed.lex		\
++	lex-en-pun.lex		\
++	lex-en.lex		\
++	lex-festival.lex	\
++	lex-flname.lex		\
++	lex-food.lex		\
++	lex-lang.lex		\
++	lex-ln-adorn.lex	\
++	lex-lname.lex		\
++	lex-main.lex		\
++	lex-nation.lex		\
++	lex-net.lex		\
++	lex-org.lex		\
++	lex-sname.lex		\
++	lex-stopword.lex	\
++	lex-touris.lex		\
++	lex-units.lex

@@ -1,0 +1,3 @@
+version=4
+opts=dversionmangle=s/\+ds//,filenamemangle=s/.+\/v?(\d\S+)-release\.tar\.gz/friso-$1\.tar\.gz/ \
+  https://github.com/lionsoul2014/friso/tags .*/v?(\d\S+)-release\.tar\.gz

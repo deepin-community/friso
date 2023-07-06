@@ -1,0 +1,3 @@
+usr/include/friso/*
+usr/lib/*/pkgconfig/*.pc
+usr/lib/*/libfriso.so
